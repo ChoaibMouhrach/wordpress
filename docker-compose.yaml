@@ -1,0 +1,35 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 6003
+      MYSQL_DATABASE: wordpress
+    healthcheck:
+      test: "mysql -uroot -p6003"
+      interval: 1s
+      retries: 60
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: 6003
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_TABLE_PREFIX: wp
+    ports:
+      - 8000:80
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - wp-content:/var/www/html/wp-content
+
+volumes:
+  db_data:
+  wp-content:
